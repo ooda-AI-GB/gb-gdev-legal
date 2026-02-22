@@ -40,6 +40,9 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+from viv_auth import init_auth
+init_auth(app, engine, models.Base, get_db, app_name="Legal Pro")
+
 
 # ---------------------------------------------------------------------------
 # Root dashboard — no auth required
