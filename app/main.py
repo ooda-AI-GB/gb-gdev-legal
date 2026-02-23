@@ -41,7 +41,7 @@ app = FastAPI(
 )
 
 from viv_auth import init_auth
-init_auth(app, engine, models.Base, get_db, app_name="Legal Pro")
+User, require_auth = init_auth(app, engine, models.Base, get_db, app_name="Legal Pro")
 
 
 # ---------------------------------------------------------------------------
@@ -49,7 +49,7 @@ init_auth(app, engine, models.Base, get_db, app_name="Legal Pro")
 # ---------------------------------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
-def root_dashboard(db: Session = Depends(get_db)):
+def root_dashboard(db: Session = Depends(get_db), user=Depends(require_auth)):
     contract_count = db.query(sqlfunc.count(Contract.id)).scalar() or 0
     active = db.query(sqlfunc.count(Contract.id)).filter(Contract.status == "active").scalar() or 0
     draft = db.query(sqlfunc.count(Contract.id)).filter(Contract.status == "draft").scalar() or 0
@@ -97,6 +97,7 @@ a.api-link{{display:inline-block;margin-top:1rem;padding:.5rem 1rem;background:v
   <div class="nav-links">
     <a href="/" class="nav-link active">Dashboard</a>
     <a href="/docs" class="nav-link">API Docs</a>
+    <a href="/auth/logout" class="nav-link" style="border-top:1px solid rgba(255,255,255,.1);padding-top:.75rem;margin-top:.5rem;color:#f87171">Logout</a>
   </div>
 </div>
 <div class="main">
